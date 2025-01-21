@@ -1,0 +1,319 @@
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus" style="font-size:14px"></i>
+                                    Tambah Barang
+                            </button>
+                            
+                            <a href="export.php" class="btn btn-info" style="color: white;">
+                                    Export Data
+                            </a>
+                            <!-- The Modal -->
+                            <div class="modal fade" id="myModal">
+                                <div class="modal-dialog">
+                                <div class="modal-content">
+                                
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                    <h4 class="modal-title">Tambah Barang</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                            
+                                    <!-- Modal body -->
+                                    <form method="post" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <input type="text" name="namabarang1" placeholder="Nama Barang" class="form-control" required>
+                                        <br>
+                                        <input type="text" name="deskripsi" placeholder="Deskripsi Barang" class="form-control" required>
+                                        <br>
+                                        <input type="number" name="stock" placeholder="Stock" class="form-control" required>
+                                        <br>
+                                        <input type="file" name="images" class="form-control">
+                                        <br>
+                                        <button type="submit" class="btn btn-primary" name="addnewbarang" value="upload">Submit</button>
+                                    </div>
+                                    </form>
+                                </div>
+                                </div>
+                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Gambar</th>
+                                                <th>Nama Barang</th>
+                                                <th>Deskripsi</th>
+                                                <th>Stock</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <?php
+                                                $ambilsemuadatastock = mysqli_query($conn, "select * from stock");
+                                                $i = 1;
+                                                while($data=mysqli_fetch_array($ambilsemuadatastock)){
+                                                    $namabarang = $data['namabarang'];
+                                                    $deskripsi = $data['deskripsi'];
+                                                    $stock = $data['stock'];
+                                                    $idb = $data['idbarang'];
+
+
+                                                    //cek gambar
+                                                    $gambar = $data['image'];
+                                                    if($gambar==null){
+                                                        //jika tidak ada gambar
+                                                        $img = 'No Photo';
+                                                    } else {
+                                                        //jika ada gambar
+                                                        $img = '<img src="img/stock/'.$gambar.'" class="sizeimage">';
+                                                    }
+                                            ?>
+                                            
+                                            <tr>
+                                                <td><?=$i++?></td>
+                                                <td><?=$img;?></td>
+                                                <td><?=$namabarang;?></td>
+                                                <td><?=$deskripsi;?></td>
+                                                <td><?=$stock;?></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#edit<?=$idb;?>">
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete<?=$idb;?>">
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Edit Modal -->
+                                            <div class="modal fade" id="edit<?=$idb;?>">
+                                                <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                    <h4 class="modal-title">Edit Barang</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    </div>
+                                                    
+                                                    <!-- Modal body -->
+                                                    <form method="post" enctype="multipart/from-data">
+                                                    <div class="modal-body">
+                                                        <input type="text" name="namabarang1" value="<?=$namabarang;?>" class="form-control" required>
+                                                        <br>
+                                                        <input type="text" name="deskripsi" value="<?=$deskripsi;?>" class="form-control" required>
+                                                        <br>
+                                                        <input type="hidden" name="idb" value="<?=$idb;?>">
+                                                        <button type="submit" class="btn btn-primary" name="updatebarang">Submit</button>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="delete<?=$idb;?>">
+                                                <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                    <h4 class="modal-title">Hapus Barang</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    </div>
+                                                    
+                                                    <!-- Modal body -->
+                                                    <form method="post">
+                                                    <div class="modal-body">
+                                                        Apakah Anda yakin ingin menghapus <?=$namabarang;?>?
+                                                        <input type="hidden" name="idb" value="<?=$idb;?>">
+                                                        <br>
+                                                        <br>
+                                                        <input type="text" name="deskripsi" value="<?=$deskripsi;?>" class="form-control" required>
+                                                        <br>
+                                                        <button type="submit" class="btn btn-danger" name="hapusbarang">Submit</button>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <?php
+                                                };
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                        </div>
+
+//function
+
+<?php
+session_start();
+
+//Koneksi ke Database
+$conn = mysqli_connect("localhost","root","","aplikasipeminjaman");
+
+
+//Menambahkan Barang Baru
+
+if(isset($_POST['addnewbarang'])){
+    $namabarang = $_POST['namabarang1'];
+    $deskripsi = $_POST['deskripsi'];
+    $stock = $_POST['stock'];
+
+    $allowed_extension = array('png','jpg');
+    $nama = $_FILES['images']['name'];
+    $dot = explode('.',$nama);
+    $ekstensi = strtolower(end($dot));
+    $ukuran = $_FILES['images']['size'];
+    $file_tmp = $_FILES['images']['tmp_name'];
+    $dir_upload = "img/stock/";
+
+    //penamaan file enkripsi
+    $image = md5(uniqid($nama,true). time()).'.'.$ekstensi;
+
+    //validasi udah ada atau belum
+    $cek = mysqli_query($conn , "select * from stock where namabarang='$namabarang'");
+    $hitung = mysqli_num_rows($cek);
+
+    if($hitung<1){
+        //jika belum ada
+        
+        //proses upload gambar
+        if(in_array($ekstensi, $allowed_extension) === true){
+            //ukuran file
+            if($ukuran < 15000000){
+                move_uploaded_file($file_tmp, $dir_upload.$image);
+
+                $addtotable = mysqli_query($conn, "insert into stock (namabarang, deskripsi, stock, image) values('$namabarang', '$deskripsi', '$stock', '$image')");
+                if($addtotable){
+                    header('location:index.php');
+                } else {
+                    echo 'Gagal';
+                    header('location:index.php');
+                }
+            } else {
+                //jika filenya lebih dari ukuran
+                echo '
+                <script>
+                    alert("Ukuran File terlalu besar");
+                    window.location.href="index.php";
+                </script>
+                ';
+            }
+        } else {
+            //jika filenya tidak sesuai
+            echo '
+            <script>
+                alert("Jenis File tidak sesuai");
+                window.location.href="index.php";
+            </script>
+            ';
+        }
+
+
+    } else {
+        //jika sudah ada
+        echo '
+        <script>
+            alert("Nama barang sudah terdaftar");
+            window.location.href="index.php";
+        </script>
+        ';
+    }
+}
+
+//Update Barang
+if(isset($_POST['updatebarang'])){
+    $idb = $_POST['idb'];
+    $namabarang = $_POST['namabarang1'];
+    $deskripsi = $_POST['deskripsi'];
+
+    $allowed_extension = array('png','jpg');
+    $nama = $_FILES['images']['name'];
+    $dot = explode('.',$nama);
+    $ekstensi = strtolower(end($dot));
+    $ukuran = $_FILES['images']['size'];
+    $file_tmp = $_FILES['images']['tmp_name'];
+    $dir_upload = "img/stock/";
+
+    //penamaan file enkripsi
+    $image = md5(uniqid($nama,true). time()).'.'.$ekstensi;
+
+    //validasi udah ada atau belum
+    $cek = mysqli_query($conn , "select * from stock where namabarang='$namabarang'");
+    $hitung = mysqli_num_rows($cek);
+
+    if($hitung<1){
+        //jika belum ada
+        
+        //proses upload gambar
+        if(in_array($ekstensi, $allowed_extension) === true){
+            //ukuran file
+            if($ukuran < 15000000){
+                move_uploaded_file($file_tmp, $dir_upload.$image);
+
+                $addtotable = mysqli_query($conn, "insert into stock (namabarang, deskripsi, stock, image) values('$namabarang', '$deskripsi', '$stock', '$image')");
+                if($addtotable){
+                    header('location:index.php');
+                } else {
+                    echo 'Gagal';
+                    header('location:index.php');
+                }
+            } else {
+                //jika filenya lebih dari ukuran
+                echo '
+                <script>
+                    alert("Ukuran File terlalu besar");
+                    window.location.href="index.php";
+                </script>
+                ';
+            }
+        } else {
+            //jika filenya tidak sesuai
+            echo '
+            <script>
+                alert("Jenis File tidak sesuai");
+                window.location.href="index.php";
+            </script>
+            ';
+        }
+
+
+    } else {
+        //jika sudah ada
+        echo '
+        <script>
+            alert("Nama barang sudah terdaftar");
+            window.location.href="index.php";
+        </script>
+        ';
+    }
+
+    $update = mysqli_query($conn, "update stock set namabarang='$namabarang', image='$image', deskripsi='$deskripsi' where idbarang='$idb'");
+    if($update){
+        header('location:index.php');
+    } else {
+        echo 'Gagal';
+        header('location:index.php');
+    }
+}
+
+
+//Menghapus barang
+if(isset($_POST['hapusbarang'])){
+    $idb = $_POST['idb'];
+
+    $gambar = mysqli_query($conn, "select * from stock where idbarang='$idb'");
+    $get = mysqli_fetch_array($gambar);
+    $img = 'img/stock/'.$get['image'];
+    unlink($img);
+
+    $hapus = mysqli_query($conn, "delete from stock where idbarang='$idb'");
+    if($hapus){
+        header('location:index.php');
+    } else {
+        echo 'Gagal';
+        header('location:index.php');
+    }
+}
+?>
